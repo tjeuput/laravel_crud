@@ -12,9 +12,17 @@ class PostController extends Controller
     public function index(): View
     {
         $posts = Post::all();
-        return view('blog', [
+        return view('blog.index', [
             'posts' => $posts,
             'title' => 'Blog Page',
+        ]);
+    }
+
+    public function show($id){
+        $post = Post::where('id', $id)->firstOrFail();
+        return view('blog.show', [
+            'post' => $post,
+            'title' => $post->title,
         ]);
     }
 }

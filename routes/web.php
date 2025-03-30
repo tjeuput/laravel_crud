@@ -7,6 +7,7 @@ Route::get('/', function(){
     return view('home', ['title' => 'Home page']);
 });
 Route::get('/blog', [PostController::class, 'index']);
+Route::get('/blog/{post:id}', [PostController::class, 'show'])->name('blog.show');
 
 Route::get('/contact', function () {
     return view('contact', ['title' => 'Contact page']);
