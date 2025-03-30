@@ -14,12 +14,14 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('slug');
+            $table->string('slug')->unique();
             $table->text('body');
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
-            $table->string('author');
-            $table->integer('userId');
+
+            $table->foreignId('author_id')->constrained(
+                table:'users', indexName:'post_user_id'
+            );
         });
     }
 

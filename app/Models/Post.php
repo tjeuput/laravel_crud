@@ -16,10 +16,10 @@ class Post extends Model
             'slug',
             'body',
             'author',
-            'userId'
+            'author_id'
     ];
 
     public function user(): BelongsTo{
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'author_id');
     }
 }

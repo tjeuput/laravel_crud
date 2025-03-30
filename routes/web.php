@@ -1,5 +1,5 @@
 <?php
-
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 
@@ -8,6 +8,7 @@ Route::get('/', function(){
 });
 Route::get('/blog', [PostController::class, 'index']);
 Route::get('/blog/{post:id}', [PostController::class, 'show'])->name('blog.show');
+Route::get('/authors/{userId}', [PostController::class, 'showByAuthor'])->name('authors.show');
 
 Route::get('/contact', function () {
     return view('contact', ['title' => 'Contact page']);
