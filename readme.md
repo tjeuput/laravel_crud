@@ -130,7 +130,7 @@ Understanding how component in Laravel works
 
 ![laravel_components_diagram.drawio.png](laravel_components_diagram.drawio.png)
 
-On how blog MVC relates with one another
+On how blog MVC relates with one another, from routing web.php, view with blades layout and components, BlogController as logic
 ![laravel_system.jpg](laravel_system.jpg)
 
 
