@@ -4,7 +4,7 @@ A simple blog application built with Laravel and TailwindCSS.
 
 ## Overview
 
-This is a blog platform that allows you to create posts, users with factory method, read, and manage blog posts.
+This is a blog platform that allows you to create posts, users with factory method, read, and manage blog posts. 
 
 ## Features
 
@@ -262,8 +262,6 @@ Laravel factories avoid constructors for attributes because:
 2. **Performance**: Delays fake data generation until needed.
 3. **Clarity**: Explicit `state()` calls are more readable than constructor params.
 
-This design is why Laravel factories are both **powerful and elegant** ✨.
-
 ### **What is a Closure in PHP?**
 
 A **closure** is an anonymous function (a function without a name) that can:
@@ -392,7 +390,7 @@ $users->filter(function ($user) {
 
 - A closure is an **anonymous function + captured scope**.
 - Laravel uses them extensively for **flexible, deferred execution** (factories, routes).
-- They enable **clean, expressive code** without polluting the global namespace. 🚀
+- They enable **clean, expressive code** without polluting the global namespace.
 
 Database migration Eloquent Relationship
 
