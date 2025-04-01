@@ -83,20 +83,7 @@ php artisan serve
 ```
 
 Now you can access the application at http://localhost:8000
-
-## Development
-
-### Build assets for production
-
-```bash
-npm run build
-```
-
-### Run tests
-
-```bash
-php artisan test
-```
+Or you can install laravel Herd https://herd.laravel.com/
 
 ### Using the dev command
 
@@ -122,39 +109,6 @@ DB_DATABASE=laravel
 DB_USERNAME=root
 DB_PASSWORD=
 ```
-
-### Mail Configuration
-
-Configure your mail settings in the `.env` file:
-
-```
-MAIL_MAILER=smtp
-MAIL_HOST=mailhog
-MAIL_PORT=1025
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_ENCRYPTION=null
-MAIL_FROM_ADDRESS="hello@example.com"
-MAIL_FROM_NAME="${APP_NAME}"
-```
-
-## Deployment
-
-### Preparing for Production
-
-1. Set proper environment variables in `.env`
-2. Optimize the application
-   ```bash
-   php artisan optimize
-   ```
-3. Build assets for production
-   ```bash
-   npm run build
-   ```
-
-### Serving in Production
-
-For production environments, you should use a proper web server like Nginx or Apache. Configure your web server to point to the `public` directory of the application.
 
 ## License
 
