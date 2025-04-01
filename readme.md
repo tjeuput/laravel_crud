@@ -1,8 +1,186 @@
+# Blog Application
+
+A simple blog application built with Laravel and TailwindCSS.
+
+## Overview
+
+This is a blog platform that allows you to create, read, and manage blog posts. It's built using modern technologies and follows best practices for web development.
+
+## Features
+
+- Modern, responsive design using TailwindCSS 4
+- Blog post listing with pagination
+- Individual blog post views
+- User authentication system
+- Admin panel for managing content (coming soon)
+
+## Tech Stack
+
+- **Backend**: Laravel 12
+- **Frontend**: TailwindCSS 4 
+- **Database**: SQLite (default, configurable)
+- **Build Tool**: Vite
+
+## Requirements
+
+- PHP >= 8.2
+- Composer
+- Node.js >= 18
+- npm or yarn
+
+## Installation
+
+### Step 1: Clone the repository
+
+```bash
+git clone https://github.com/yourusername/blog-app.git
+cd blog-app
+```
+
+### Step 2: Install dependencies
+
+```bash
+# Install PHP dependencies
+composer install
+
+# Install Node.js dependencies
+npm install
+```
+
+### Step 3: Set up environment
+
+```bash
+# Copy the environment file
+cp .env.example .env
+
+# Generate application key
+php artisan key:generate
+```
+
+### Step 4: Create the database
+
+```bash
+# Create SQLite database
+touch database/database.sqlite
+
+# Run migrations
+php artisan migrate
+
+# Seed the database with sample data
+php artisan db:seed
+```
+
+### Step 5: Start the development server
+
+```bash
+# Start Laravel server and Vite development server
+npm run dev
+```
+
+In a separate terminal window:
+
+```bash
+# Start the PHP server
+php artisan serve
+```
+
+Now you can access the application at http://localhost:8000
+
+## Development
+
+### Build assets for production
+
+```bash
+npm run build
+```
+
+### Run tests
+
+```bash
+php artisan test
+```
+
+### Using the dev command
+
+The project includes a convenient `dev` command that starts all necessary services:
+
+```bash
+composer run dev
+```
+
+This will run the Laravel development server, queue worker, and Vite development server simultaneously.
+
+## Configuration
+
+### Database Configuration
+
+The application is configured to use SQLite by default, but you can change this in the `.env` file:
+
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### Mail Configuration
+
+Configure your mail settings in the `.env` file:
+
+```
+MAIL_MAILER=smtp
+MAIL_HOST=mailhog
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+## Deployment
+
+### Preparing for Production
+
+1. Set proper environment variables in `.env`
+2. Optimize the application
+   ```bash
+   php artisan optimize
+   ```
+3. Build assets for production
+   ```bash
+   npm run build
+   ```
+
+### Serving in Production
+
+For production environments, you should use a proper web server like Nginx or Apache. Configure your web server to point to the `public` directory of the application.
+
+## License
+
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Credits
+
+- [Laravel](https://laravel.com/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [Vite](https://vitejs.dev/)
+
 # Laravel Blog CRUD
 
 Understanding how component in Laravel works
 
 ![laravel_components_diagram.drawio.png](laravel_components_diagram.drawio.png)
+
+On how blog MVC relates with one another
+![laravel_system.jpg]
+
 
 Factory
 
@@ -37,9 +215,7 @@ The `state()` method uses closures to:
 - **Preserve the current attributes** at the time of execution.
 - **Allow conditional logic** based on existing attributes:
     
-    php
-    
-    Copy
+
     
     ```
     return $this->state(fn (array $attrs) => [
