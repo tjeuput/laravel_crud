@@ -1,66 +1,284 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Blog CRUD
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Understanding how component in Laravel works
 
-## About Laravel
+![laravel_components_diagram.drawio.png](laravel_components_diagram.drawio.png)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Factory
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+In Laravel's factory system, the **`$attributes` parameter is not passed via a constructor** because of how the factory pipeline is designed. Here's why:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+### **1. Dynamic Attribute Resolution**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Factories need to **lazily evaluate attributes** because:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- Some values (like `fake()->email()`) must be generated at runtime.
+- Attributes can be **sequentially modified** by multiple `>state()` calls.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### **Example Workflow:**
 
-## Laravel Sponsors
+```
+User::factory()
+    ->state(['name' => 'Alice'])  // State 1
+    ->state(['is_admin' => true]) // State 2
+    ->create();
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Each `state()` call progressively modifies the attributes. A constructor couldn't handle this dynamic merging.
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### **2. Closures Allow Late Binding**
 
-## Contributing
+The `state()` method uses closures to:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- **Preserve the current attributes** at the time of execution.
+- **Allow conditional logic** based on existing attributes:
+    
+    php
+    
+    Copy
+    
+    ```
+    return $this->state(fn (array $attrs) => [
+        'email' => $attrs['name'] . '@company.com', // Uses 'name' from previous state
+    ]);
+    ```
+    
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### **3. Constructor Limitations**
 
-## Security Vulnerabilities
+If factories used constructors for attributes:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **Inflexible**: Would require all attributes upfront.
+- **No Chaining**: Couldn’t support fluent `>state()->create()` syntax.
+- **Performance Overhead**: Would force eager evaluation of fake data.
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### **How Laravel Factories Actually Work**
+
+1. **Step 1**: `definition()` sets defaults.
+2. **Step 2**: `state()` closures sequentially modify attributes.
+3. **Step 3**: `create()`/`make()` finalizes and builds the model.
+
+### **Under the Hood:**
+
+```
+// Simplified factory logic
+public function state(callable $closure)
+{
+    $this->states[] = $closure; // Stores closures for later execution
+    return $this;
+}
+
+public function create()
+{
+    $attributes = $this->definition(); // Start with defaults
+    foreach ($this->states as $closure) {
+        $attributes = array_merge($attributes, $closure($attributes)); // Merges states
+    }
+    return User::create($attributes);
+}
+```
+
+---
+
+### **Key Advantages Over Constructor-Based Design**
+
+| **Feature** | **Closure-Based (`state()`)** | **Constructor-Based** |
+| --- | --- | --- |
+| **Dynamic Attributes** | ✅ Late evaluation | ❌ Eager evaluation |
+| **Sequential Modifications** | ✅ Supports chaining | ❌ Single-shot |
+| **Conditional Logic** | ✅ Access to interim attributes | ❌ No context |
+| **Fake Data Generation** | ✅ On-demand (`fake()`) | ❌ Must generate upfront |
+
+---
+
+### **When Would You Use a Constructor?**
+
+Only for **static factory configuration**, not attributes:
+
+```
+class UserFactory extends Factory
+{
+    public function __construct(
+        protected bool $isAdmin = false // Config flag, NOT user attributes
+    ) {
+        parent::__construct();
+    }
+
+    public function definition()
+    {
+        return [
+            'is_admin' => $this->isAdmin, // Passes config to attributes
+        ];
+    }
+}
+
+// Usage
+User::factory(isAdmin: true)->create();
+```
+
+---
+
+### **Summary**
+
+Laravel factories avoid constructors for attributes because:
+
+1. **Flexibility**: Closures allow dynamic, sequential changes.
+2. **Performance**: Delays fake data generation until needed.
+3. **Clarity**: Explicit `state()` calls are more readable than constructor params.
+
+This design is why Laravel factories are both **powerful and elegant** ✨.
+
+### **What is a Closure in PHP?**
+
+A **closure** is an anonymous function (a function without a name) that can:
+
+1. **Capture variables** from its surrounding scope (even after that scope has exited).
+2. **Be passed as an argument** to other functions/methods.
+3. **Be stored in variables** or executed later.
+
+---
+
+### **Key Features of Closures**
+
+| **Feature** | **Description** |
+| --- | --- |
+| **Anonymous** | Has no function name (e.g., `function () { ... }`). |
+| **Captures State** | "Remembers" variables from its parent scope (via `use` keyword). |
+| **First-Class Citizen** | Can be assigned to variables, passed as arguments, or returned from functions. |
+
+---
+
+### **Example 1: Basic Closure**
+
+```
+$greet = function ($name) {
+    return "Hello, $name!";
+};
+
+echo $greet("Alice"); // Output: "Hello, Alice!"
+```
+
+---
+
+### **Example 2: Capturing Variables (with `use`)**
+
+```
+$prefix = "Mr. ";
+$greet = function ($name) use ($prefix) {
+    return "$prefix$name";
+};
+
+echo $greet("Smith"); // Output: "Mr. Smith"
+```
+
+- The `use ($prefix)` allows the closure to "remember" `$prefix` even if it goes out of scope.
+
+---
+
+### **Why Closures Matter in Laravel Factories**
+
+In Laravel factories, closures are used in `state()` to **dynamically modify attributes**:
+
+```
+public function isAdmin(): static
+{
+    return $this->state(function (array $attributes) {
+        return ['is_admin' => true]; // Merges with existing $attributes
+    });
+}
+```
+
+Here, the closure:
+
+1. Takes the current `$attributes` as input.
+2. Returns new attributes to merge.
+3. **Preserves the factory's fluent chaining** (e.g., `>state()->create()`).
+
+---
+
+### **Closures vs. Regular Functions**
+
+| **Feature** | **Closure** | **Regular Function** |
+| --- | --- | --- |
+| **Name** | Anonymous | Named (e.g., `foo()`) |
+| **Scope Capture** | Yes (via `use`) | No |
+| **Usage in Laravel** | Factory states, route definitions | Global/class methods |
+
+---
+
+### **Practical Laravel Examples**
+
+### 1. **Factory State (Dynamic Attributes)**
+
+```
+User::factory()->state(function (array $attrs) {
+    return ['email' => strtolower($attrs['name']) . '@test.com'];
+})->create();
+```
+
+![laravel_components_diagram.drawio.png](laravel_components_diagram.drawio%201.png)
+
+### 2. **Route Definitions**
+
+```
+Route::get('/user', function () {
+    return view('user.profile');
+});
+```
+
+### 3. **Collection Operations**
+
+```
+$users->filter(function ($user) {
+    return $user->isAdmin();
+});
+```
+
+---
+
+### **Under the Hood: How Closures Work**
+
+1. **PHP creates a `Closure` object** behind the scenes.
+2. **Captured variables** are stored in the closure's scope.
+3. **Executed later** (e.g., when `create()` is called in factories).
+
+---
+
+### **When to Use Closures**
+
+- **Short-lived logic** (e.g., factory states, route handlers).
+- **Capturing context** (e.g., loop variables, service containers).
+- **Functional programming patterns** (e.g., `array_map`, `filter`).
+
+---
+
+### **Summary**
+
+- A closure is an **anonymous function + captured scope**.
+- Laravel uses them extensively for **flexible, deferred execution** (factories, routes).
+- They enable **clean, expressive code** without polluting the global namespace. 🚀
+
+Database migration Eloquent Relationship
+
+### [**Foreign Key Constraints**](https://laravel.com/docs/12.x/migrations#foreign-key-constraints)
+
+Laravel also provides support for creating foreign key constraints, which are used to force referential integrity at the database level. For example, let's define a **`user_id`** column on the **`posts`** table that references the **`id`** column on a **`users`** table:
+
+```jsx
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+Schema::table('posts', function (Blueprint $table) {
+    $table->unsignedBigInteger('user_id');
+
+    $table->foreign('user_id')->references('id')->on('users');
+});
+```
