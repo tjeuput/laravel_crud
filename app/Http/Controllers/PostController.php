@@ -10,7 +10,7 @@ class PostController extends Controller
 {
     public function index(): View
     {
-        $posts = Post::with('user')->get();
+        $posts = Post::with('user')->paginate(5);
         return view('blog.index', [
             'posts' => $posts,
             'title' => 'Blog Page',
@@ -48,9 +48,12 @@ class PostController extends Controller
             return redirect()->route('blog.index');
         }
 
+
         $posts = Post::query()
             ->where('title', 'LIKE', "%{$search}%")
-            ->get();
+            ->paginate(10);
+
+        $posts->append(['search' => $search]);
 
 
         return view('blog.index', [

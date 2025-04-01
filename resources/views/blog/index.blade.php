@@ -5,8 +5,18 @@
 
        <x-search-post/>
 
-    @foreach($posts as $post)
+            @foreach($posts as $post)
             <x-post-card :post="$post"/>
-        @endforeach
-    </div>
+            @endforeach
+
+        <div class="max-w-4xl mx-auto mb-2 px-4 py-4"> {{ $posts->links() }} </div>
+
+
+
+
+
+
+        </div>
+
+
 </x-layout>
