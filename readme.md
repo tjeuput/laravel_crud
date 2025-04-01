@@ -11,8 +11,6 @@ This is a blog platform that allows you to create, read, and manage blog posts. 
 - Modern, responsive design using TailwindCSS 4
 - Blog post listing with pagination
 - Individual blog post views
-- User authentication system
-- Admin panel for managing content (coming soon)
 
 ## Tech Stack
 
