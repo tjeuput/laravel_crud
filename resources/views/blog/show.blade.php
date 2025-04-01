@@ -14,7 +14,7 @@
                     {{ $post->created_at->format('M d, Y') }}
                 </span>
                 <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-medium">
-                    User ID: {{ $post->userId }}
+                    User ID: {{ $post->author_id }}
                 </span>
             </div>
 

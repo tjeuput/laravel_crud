@@ -1,7 +1,7 @@
 @props(['post'])
-<div class="max-w-4xl mx-auto px-4 py-8">
+<div class="max-w-4xl mx-auto mb-2 px-4 py-4">
     <article class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-100 transition-all hover:shadow-xl">
-        <div class="p-6">
+        <div class="p-4">
             <div class="flex items-center justify-between mb-4">
             <span class="text-sm text-gray-500">
                 {{ $post->created_at->format('M d, Y') }}

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class PostController extends Controller
@@ -34,12 +33,31 @@ class PostController extends Controller
             return redirect()->route('blog.index')->with('error', 'No posts found for this author');
         }
 
-        // Get the author name from the related user
         $authorName = $posts->first()->user->name ?? 'Author';
 
         return view('blog.index', [
             'posts' => $posts,
             'title' => "Posts by $authorName",
         ]);
+    }
+
+    public function search(Request $request){
+        $search = $request->input('search');
+
+        if($search ===''){
+            return redirect()->route('blog.index');
+        }
+
+        $posts = Post::query()
+            ->where('title', 'LIKE', "%{$search}%")
+            ->get();
+
+
+        return view('blog.index', [
+            'posts' => $posts,
+            'title' => 'Search Results: ' . $search,
+        ]);
+
+
     }
 }
