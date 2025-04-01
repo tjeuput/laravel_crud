@@ -4,7 +4,7 @@ A simple blog application built with Laravel and TailwindCSS.
 
 ## Overview
 
-This is a blog platform that allows you to create, read, and manage blog posts. It's built using modern technologies and follows best practices for web development.
+This is a blog platform that allows you to create posts, users with factory method, read, and manage blog posts.
 
 ## Features
 
@@ -177,7 +177,7 @@ Understanding how component in Laravel works
 ![laravel_components_diagram.drawio.png](laravel_components_diagram.drawio.png)
 
 On how blog MVC relates with one another
-![laravel_system.jpg]
+![laravel_system.jpg](laravel_system.jpg)
 
 
 Factory
